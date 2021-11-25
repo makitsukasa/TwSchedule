@@ -15,8 +15,9 @@ def hello():
 		content += "Retrieved configuration setting:<br>"
 		content += "Key: " + retrieved_config_setting.key + ", Value: " + retrieved_config_setting.value
 		return content
+
 	except Exception as e:
-		return "Exception:" + str(traceback.format_exc())
+		return "Exception:" + str(traceback.format_exc()), 500
 
 if __name__ == "__main__":
 	app.run(debug = True)
