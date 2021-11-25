@@ -1,2 +1,3 @@
 azure
+azure-appconfiguration
 Flask==1.1.2
