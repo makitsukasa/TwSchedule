@@ -1,6 +1,5 @@
 import os
 import traceback
-from azure.appconfiguration import AzureAppConfigurationClient, ConfigurationSetting
 from flask import Flask
 app = Flask(__name__)
 
@@ -9,11 +8,8 @@ def hello():
 	# return "Hello, World!"
 	try:
 		content = ""
-		connection_string = os.getenv("CUSTOMCONNSTR_AZURE_APP_CONFIG_CONNECTION_STRING")
-		app_config_client = AzureAppConfigurationClient.from_connection_string(connection_string)
-		retrieved_config_setting = app_config_client.get_configuration_setting(key='test')
-		content += "Retrieved configuration setting:<br>"
-		content += "Key: " + retrieved_config_setting.key + ", Value: " + retrieved_config_setting.value
+		connection_string = os.getenv("CUSTOMCONNSTR_TWITTER_ACCESS_TOKEN")
+		content += "key: " + retrieved_config_setting.key + ", secret: ***"
 		return content
 
 	except Exception as e:
