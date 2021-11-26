@@ -10,7 +10,7 @@ def hello():
 		content = ""
 		access_token = os.getenv("CUSTOMCONNSTR_TWITTER_ACCESS_TOKEN")
 		consumer_key, consumer_secret = access_token.split(";")
-		content += "key: " + consumer_key[:5] + "***, secret: ***"
+		content += "key: " + consumer_key[:2] + "***" + consumer_key[-2:] + ", secret: ***"
 		return content
 
 	except Exception as e:
