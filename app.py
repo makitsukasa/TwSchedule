@@ -1,19 +1,13 @@
-import os
-import hashlib
+from time import sleep
 import traceback
-from flask import Flask, request
-import tweepy
+from flask import Flask
+from tweet import tweet, delete_previous_tweet
+from flaskasync import flask_async, flask_async_tasks
 
 app = Flask(__name__)
 
-KEYS = os.getenv("CUSTOMCONNSTR_TWITTER_KEYS")
-CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET = KEYS.split(";")
-AUTH = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-AUTH.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-tweepy_api = tweepy.API(AUTH)
-
 @app.route("/")
-def hello():
+def app_route_index():
 	try:
 		return "Hello, World!"
 
@@ -21,14 +15,13 @@ def hello():
 		return "Exception:" + str(traceback.format_exc()), 500
 
 @app.route("/tweet", methods=["POST"])
-def tweet():
-	print(request.form)
-	if not request.form.get("key") or not request.form.get("body"):
+@flask_async
+def app_route_tweet():
+	status = tweet()
+	if status:
+		return "tweeted"
+	else:
 		return "irregal access", 400
-	if request.form["key"] != hashlib.sha256(str(KEYS).encode('utf-8')).hexdigest():
-		return "irregal access", 400
-	tweepy_api.update_status(request.form["body"])
-	return "tweeted"
 
 if __name__ == "__main__":
 	app.run(debug = True)
