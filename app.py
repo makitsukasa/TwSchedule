@@ -30,7 +30,6 @@ def app_route_tweet():
 def app_route_update_mail_notice():
 	if not check_key():
 		return "irregal access", 400
-
 	body = request.form.get("body")
 	if not body:
 		return "irregal access", 400
@@ -45,7 +44,6 @@ def app_route_update_mail_notice():
 def app_route_update_schedule_notice():
 	if not check_key():
 		return "irregal access", 400
-
 	body = request.form.get("body")
 	if not body:
 		return "irregal access", 400

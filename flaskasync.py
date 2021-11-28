@@ -3,6 +3,7 @@
 import threading
 import uuid
 from functools import wraps
+import time
 
 from flask import current_app, request, abort
 from werkzeug.exceptions import HTTPException, InternalServerError
@@ -34,11 +35,12 @@ def flask_async(f):
 		# Record the task, and then launch it
 		flask_async_tasks[task_id] = {"task": threading.Thread(
 			target=task, args=(current_app._get_current_object(), request.environ))}
+		flask_async_tasks[task_id]["timestamp"] = time.time()
 		flask_async_tasks[task_id]["task"].start()
 		print("new task started ", task_id)
 
 		# Return a 202 response, with an id that the client can use to obtain task status
-		return {"TaskId": task_id}, 202
+		return {"taskid": task_id}, 202
 
 	return wrapped
 
@@ -47,12 +49,12 @@ def flask_async_result(task_id = None):
 	# If this request returns a 202 status code, it means that task hasn't finished yet.
 	if task_id:
 		task = flask_async_tasks.get(task_id)
-	elif len(flask_async_tasks) == 1:
-		task = list(flask_async_tasks)[0]
+	elif len(flask_async_tasks) == 0:
+		abort(404)
 	else:
-		task = None
+		task = sorted(list(flask_async_tasks.values()), key = lambda i: i["timestamp"])[0]
 	if task is None:
 		abort(404)
 	if "result" not in task:
-		return {"TaskID": task_id}, 202
+		return {"taskid": task_id}, 202
 	return task["result"]
