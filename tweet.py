@@ -39,7 +39,6 @@ def delete_all_tweets(hashtag, user_id):
 def get_latest_tweet_text(hashtag, user_id):
 	status = tweepy_api.search_tweets(q = hashtag + " from:" + user_id)
 	if len(status) <= 0:
-		print("No tweet with hashtag " + hashtag + " were found")
 		return False
 	return sorted(status, key = lambda i: i.created_at, reverse = True)[0].text
 
@@ -59,5 +58,6 @@ def update_notice(body, hashtag, user_id, should_update):
 		# どちらでもない(前のツイートと内容が変わっている)なら下に合流
 
 	# これまでのツイートを消して新しくツイート
+	print("Update")
 	delete_all_tweets(hashtag, user_id)
 	return tweet(body + "\n" + hashtag)
