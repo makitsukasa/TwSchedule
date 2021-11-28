@@ -34,7 +34,7 @@ def app_route_update_mail_notice():
 	body = request.form.get("body")
 	if not body:
 		return "irregal access", 400
-	force_update = True if request.form.get("force_update") else False
+	force_update = True if request.form.get("force_update") == "true" else False
 
 	if not update_mail_notice(body, force_update):
 		return "server error", 500
@@ -49,7 +49,7 @@ def app_route_update_schedule_notice():
 	body = request.form.get("body")
 	if not body:
 		return "irregal access", 400
-	force_update = True if request.form.get("force_update") else False
+	force_update = True if request.form.get("force_update") == "true" else False
 
 	if not update_schedule_notice(body, force_update):
 		return "server error", 500
