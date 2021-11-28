@@ -1,5 +1,6 @@
 from time import sleep
 import traceback
+import json
 from flask import Flask, request
 from flaskasync import flask_async, flask_async_result
 from tweet import tweet, check_key
@@ -60,6 +61,11 @@ def app_route_result():
 @app.route("/result/<task_id>", methods=["GET"])
 def app_route_result_by_id(task_id):
 	return flask_async_result()
+
+@app.route("/receivepost", methods=["POST"])
+@flask_async
+def app_route_receivepost():
+	return request.get_data()
 
 if __name__ == "__main__":
 	app.run(debug = True)
