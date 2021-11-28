@@ -49,8 +49,7 @@ def update_notice(body, hashtag, user_id, should_update):
 		if not latest_text:
 			# 前にツイートがないならツイートだけ
 			print("No tweet with hashtag " + hashtag + " were found")
-			tweet(body + "\n" + hashtag)
-			return True
+			return tweet(body + "\n" + hashtag)
 
 		if latest_text == body + "\n" + hashtag:
 			# 直近のツイートと変わらないならなにもせずreturn
@@ -61,5 +60,4 @@ def update_notice(body, hashtag, user_id, should_update):
 
 	# これまでのツイートを消して新しくツイート
 	delete_all_tweets(hashtag, user_id)
-	tweet(body + "\n" + hashtag)
-	return True
+	return tweet(body + "\n" + hashtag)

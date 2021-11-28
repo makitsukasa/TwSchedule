@@ -42,10 +42,15 @@ def flask_async(f):
 
 	return wrapped
 
-def flask_async_result(task_id):
+def flask_async_result(task_id = None):
 	# Return results of asynchronous task.
 	# If this request returns a 202 status code, it means that task hasn't finished yet.
-	task = flask_async_tasks.get(task_id)
+	if task_id:
+		task = flask_async_tasks.get(task_id)
+	elif len(flask_async_tasks) == 1:
+		task = list(flask_async_tasks)[0]
+	else:
+		task = None
 	if task is None:
 		abort(404)
 	if "result" not in task:

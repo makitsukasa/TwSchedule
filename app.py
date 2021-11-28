@@ -38,7 +38,7 @@ def app_route_update_mail_notice():
 
 	if not update_mail_notice(body, force_update):
 		return "server error", 500
-	return "update succeed"
+	return "update succeed", 200
 
 @app.route("/schedule", methods=["POST"])
 @flask_async
@@ -53,11 +53,19 @@ def app_route_update_schedule_notice():
 
 	if not update_schedule_notice(body, force_update):
 		return "server error", 500
-	return "update succeed"
+	return "update succeed", 200
+
+@app.route("/result", methods=["GET"])
+def app_route_result():
+	if not flask_async_result():
+		return "server error", 500
+	return "update succeed", 200
 
 @app.route("/result/<task_id>", methods=["GET"])
-def app_route_result(task_id):
-	return flask_async_result(task_id)
+def app_route_result_by_id(task_id):
+	if not flask_async_result(task_id):
+		return "server error", 500
+	return "update succeed", 200
 
 if __name__ == "__main__":
 	app.run(debug = True)
