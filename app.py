@@ -23,5 +23,10 @@ def app_route_tweet():
 	else:
 		return "irregal access", 400
 
+@app.route("/update", methods=["POST"])
+@flask_async
+def app_route_update():
+	delete_previous_tweet()
+
 if __name__ == "__main__":
 	app.run(debug = True)

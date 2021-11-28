@@ -16,3 +16,11 @@ def tweet():
 		return False
 	tweepy_api.update_status(request.form["body"])
 	return True
+
+def delete_previous_tweet(hashtag, user_id):
+	status = api.search(q=hashtag + " from:" + user_id)
+	if len(status) <= 0:
+		print("prev tweet for " + hashtag + " is not found")
+		return False
+	for s in status:
+		print(s.id_str)
