@@ -42,3 +42,24 @@ def get_latest_tweet_text(hashtag, user_id):
 		print("No tweet with hashtag " + hashtag + " were found")
 		return False
 	return sorted(status, key = lambda i: i.created_at, reverse = True)[0].text
+
+def update_notice(body, hashtag, user_id, should_update):
+	if not should_update:
+		latest_text = get_latest_tweet_text(hashtag, user_id)
+		if not latest_text:
+			# 前にツイートがないならツイートだけ
+			print("No tweet with hashtag " + hashtag + " were found")
+			tweet(body + "\n" + hashtag)
+			return True
+
+		if latest_text == body + "\n" + hashtag:
+			# 直近のツイートと変わらないならなにもせずreturn
+			print("The status is not changed")
+			return True
+
+		# どちらでもない(前のツイートと内容が変わっている)なら下に合流
+
+	# これまでのツイートを消して新しくツイート
+	delete_all_tweets(hashtag, user_id)
+	tweet(body + "\n" + hashtag)
+	return True
