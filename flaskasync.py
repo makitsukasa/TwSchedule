@@ -6,7 +6,7 @@ import uuid
 from functools import wraps
 
 # from flask import Flask, current_app, request, abort
-from flask import current_app, request
+from flask import current_app, request, abort
 from werkzeug.exceptions import HTTPException, InternalServerError
 
 # app = Flask(__name__)
@@ -47,24 +47,14 @@ def flask_async(f):
 
 	return wrapped
 
-# @app.route("/foo")
-# @flask_async
-# def foo():
-# 	time.sleep(10)
-# 	return {"Result": True}
-
-# @app.route("/foo/<task_id>", methods=["GET"])
-# def foo_results(task_id):
-# 	"""
-# 		Return results of asynchronous task.
-# 		If this request returns a 202 status code, it means that task hasn"t finished yet.
-# 		"""
-# 	task = flask_async_tasks.get(task_id)
-# 	if task is None:
-# 		abort(404)
-# 	if "result" not in task:
-# 		return {"TaskID": task_id}, 202
-# 	return task["result"]
-
-# if __name__ == "__main__":
-# 	app.run(debug=True)
+def flask_async_result(task_id):
+	"""
+	Return results of asynchronous task.
+	If this request returns a 202 status code, it means that task hasn"t finished yet.
+	"""
+	task = flask_async_tasks.get(task_id)
+	if task is None:
+		abort(404)
+	if "result" not in task:
+		return {"TaskID": task_id}, 202
+	return task["result"]

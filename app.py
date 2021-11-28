@@ -1,8 +1,10 @@
 from time import sleep
 import traceback
-from flask import Flask
-from tweet import tweet, delete_previous_tweet
-from flaskasync import flask_async, flask_async_tasks
+from flask import Flask, request
+from flaskasync import flask_async, flask_async_result
+from tweet import tweet, check_key
+from tweetmail import update_mail_notice
+from tweetschedule import update_schedule_notice
 
 app = Flask(__name__)
 
@@ -17,16 +19,45 @@ def app_route_index():
 @app.route("/tweet", methods=["POST"])
 @flask_async
 def app_route_tweet():
-	status = tweet()
-	if status:
-		return "tweeted"
-	else:
+	if not check_key():
+		return "irregal access", 400
+	if not tweet():
+		return "server error", 500
+	return "tweeted"
+
+@app.route("/mail", methods=["POST"])
+@flask_async
+def app_route_update_mail_notice():
+	if not check_key():
 		return "irregal access", 400
 
-@app.route("/update", methods=["POST"])
+	body = request.form.get("body")
+	if not body:
+		return "irregal access", 400
+	force_update = True if request.form.get("force_update") else False
+
+	if not update_mail_notice(body, force_update):
+		return "server error", 500
+	return "update succeed"
+
+@app.route("/schedule", methods=["POST"])
 @flask_async
-def app_route_update():
-	delete_previous_tweet()
+def app_route_update_schedule_notice():
+	if not check_key():
+		return "irregal access", 400
+
+	body = request.form.get("body")
+	if not body:
+		return "irregal access", 400
+	force_update = True if request.form.get("force_update") else False
+
+	if not update_schedule_notice(body, force_update):
+		return "server error", 500
+	return "update succeed"
+
+@app.route("/result/<task_id>", methods=["GET"])
+def app_route_result(task_id):
+	return flask_async_result(task_id)
 
 if __name__ == "__main__":
 	app.run(debug = True)
