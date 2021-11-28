@@ -2,6 +2,7 @@ import os
 from flask import request
 import hashlib
 import tweepy
+from pprint import pprint
 
 KEYS = os.getenv("CUSTOMCONNSTR_TWITTER_KEYS")
 CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET = KEYS.split(";")
@@ -16,26 +17,28 @@ def check_key():
 		return False
 	return True
 
-def tweet():
-	if not request.form.get("body"):
-		return False
-	tweepy_api.update_status(request.form["body"])
+def tweet(body = None):
+	if not body:
+		if not request.form.get("body"):
+			return False
+		body = request.form.get("body")
+	tweepy_api.update_status(body)
 	return True
 
-def delete_previous_tweet(hashtag, user_id):
-	status = tweepy_api.search_tweets(q = hashtag + " from:" + user_id)
+def delete_all_tweets(hashtag, user_id):
+	status = tweepy_api.search_tweets(
+		q = hashtag + " from:" + user_id,
+		result_type = "recent",
+		tweet_mode = "extended")
 	if len(status) <= 0:
-		print("prev tweet for " + hashtag + " is not found")
 		return False
 	for s in status:
-		print(s.id_str)
+		tweepy_api.destroy_status(s.id)
 	return True
 
-def search_latest_tweet(hashtag, user_id):
+def get_latest_tweet_text(hashtag, user_id):
 	status = tweepy_api.search_tweets(q = hashtag + " from:" + user_id)
 	if len(status) <= 0:
-		print("prev tweet for " + hashtag + " is not found")
+		print("No tweet with hashtag " + hashtag + " were found")
 		return False
-	for s in status:
-		print(s.id_str)
-	return True
+	return sorted(status, key = lambda i: i.created_at, reverse = True)[0].text
