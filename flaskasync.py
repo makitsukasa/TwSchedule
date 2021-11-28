@@ -2,20 +2,15 @@
 
 import threading
 import uuid
-# import time
 from functools import wraps
 
-# from flask import Flask, current_app, request, abort
 from flask import current_app, request, abort
 from werkzeug.exceptions import HTTPException, InternalServerError
 
-# app = Flask(__name__)
 flask_async_tasks = {}
 
 def flask_async(f):
-	"""
-	This decorator transforms a sync route to asynchronous by running it in a background thread.
-	"""
+	# This decorator transforms a sync route to asynchronous by running it in a background thread.
 	@wraps(f)
 	def wrapped(*args, **kwargs):
 		def task(app, environ):
@@ -48,10 +43,8 @@ def flask_async(f):
 	return wrapped
 
 def flask_async_result(task_id):
-	"""
-	Return results of asynchronous task.
-	If this request returns a 202 status code, it means that task hasn"t finished yet.
-	"""
+	# Return results of asynchronous task.
+	# If this request returns a 202 status code, it means that task hasn't finished yet.
 	task = flask_async_tasks.get(task_id)
 	if task is None:
 		abort(404)
