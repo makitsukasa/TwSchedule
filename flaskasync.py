@@ -50,11 +50,11 @@ def flask_async_result(task_id = None):
 	if task_id:
 		task = flask_async_tasks.get(task_id)
 	elif len(flask_async_tasks) == 0:
-		abort(404)
+		return "no task has run yet", 404
 	else:
 		task = sorted(list(flask_async_tasks.values()), key = lambda i: i["timestamp"])[0]
 	if task is None:
-		abort(404)
+		return "broken or invalid task", 404
 	if "result" not in task:
 		return {"taskid": task_id}, 202
 	return task["result"]

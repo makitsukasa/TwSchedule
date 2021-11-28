@@ -55,15 +55,11 @@ def app_route_update_schedule_notice():
 
 @app.route("/result", methods=["GET"])
 def app_route_result():
-	if not flask_async_result():
-		return "server error", 500
-	return "update succeed", 200
+	return flask_async_result()
 
 @app.route("/result/<task_id>", methods=["GET"])
 def app_route_result_by_id(task_id):
-	if not flask_async_result(task_id):
-		return "server error", 500
-	return "update succeed", 200
+	return flask_async_result()
 
 if __name__ == "__main__":
 	app.run(debug = True)
