@@ -60,7 +60,7 @@ def app_route_result():
 
 @app.route("/result/<task_id>", methods=["GET"])
 def app_route_result_by_id(task_id):
-	return flask_async_result()
+	return flask_async_result(task_id)
 
 @app.route("/receivepost", methods=["POST"])
 @flask_async
