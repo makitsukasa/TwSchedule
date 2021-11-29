@@ -35,7 +35,6 @@ def app_route_update_mail_notice():
 	if not body:
 		return "irregal access", 400
 	force_update = True if request.form.get("force_update") == "true" else False
-	print("request.form.get(\"force_update\"):", request.form.get("force_update"), ", force_update:", force_update)
 
 	if not update_mail_notice(body, force_update):
 		return "server error", 500
