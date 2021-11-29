@@ -56,6 +56,7 @@ def update_notice(body, hashtag, user_id, should_update):
 			return True
 
 		# どちらでもない(前のツイートと内容が変わっている)なら下に合流
+		print("The status is changed")
 
 	# これまでのツイートを消して新しくツイート
 	print("Update")
