@@ -6,5 +6,5 @@ def update_mail_notice(unread_count, should_update):
 	if unread_count == "0":
 		body = "未読のメールはありません"
 	else:
-		body = f"@tsukasa_metam 未読のメールが{payload}件あります"
+		body = f"@tsukasa_metam 未読のメールが{unread_count}件あります"
 	return update_notice(body, HASHTAG, USER_ID, should_update)
