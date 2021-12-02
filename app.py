@@ -37,7 +37,7 @@ def app_route_update_mail_notice():
 
 	if not update_mail_notice(body, force_update):
 		return "server error", 500
-	return "/mail post succeeded" +
+	return "/mail post succeeded" +\
 		datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'), 200
 
 @app.route("/schedule", methods=["POST"])
@@ -52,7 +52,7 @@ def app_route_update_schedule_notice():
 
 	if not update_schedule_notice(body, force_update):
 		return "server error", 500
-	return "/schedule post succeeded" +
+	return "/schedule post succeeded" +\
 		datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'), 200
 
 @app.route("/result", methods=["GET"])
