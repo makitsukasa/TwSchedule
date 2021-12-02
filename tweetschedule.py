@@ -23,7 +23,7 @@ def format(json):
 			if first_title_flag:
 				ans += " "
 			else:
-				ans += "     "
+				ans += "         "
 			ans += schedule["title"] + "\n"
 			first_title_flag = False
 	return ans[:-1]
