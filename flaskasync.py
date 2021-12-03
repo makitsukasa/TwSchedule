@@ -3,6 +3,7 @@
 import threading
 import uuid
 from functools import wraps
+import datetime
 import time
 
 from flask import current_app, request, abort
@@ -60,8 +61,10 @@ def flask_async_log(task_id = None):
 		return "broken or invalid task", 404
 	ret = ""
 	for task in tasks:
+		start = datetime.datetime.fromtimestamp(task["start_timestamp"])
 		if "result" not in task:
-			ret += f'{task["start_timestamp"]} - still running\n'
-		else:
-			ret += f'{task["start_timestamp"]} - {task["end_timestamp"]} {task["result"]}\n'
+			ret += f'{start} - still running\n'
+		else:		
+			end = datetime.datetime.fromtimestamp(task["end_timestamp"])
+			ret += f'{start} - {end} {task["result"]}\n'
 	return ret
