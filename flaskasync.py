@@ -19,12 +19,15 @@ def flask_async(f):
 			with app.request_context(environ):
 				try:
 					# Run the route function and record the response
-					flask_async_tasks[task_id]["result"] = f(*args, **kwargs)
+					flask_async_tasks[task_id]["result"] = f(*args, **kwargs)		
+					flask_async_tasks[task_id]["end_timestamp"] = time.time()
 				except HTTPException as e:
 					flask_async_tasks[task_id]["result"] = current_app.handle_http_exception(e)
+					flask_async_tasks[task_id]["end_timestamp"] = time.time()
 				except Exception as e:
 					# The function raised an exception, so we set a 500 error
 					flask_async_tasks[task_id]["result"] = InternalServerError()
+					flask_async_tasks[task_id]["end_timestamp"] = time.time()
 					if current_app.debug:
 						# We want to find out if something happened so reraise
 						raise
@@ -35,7 +38,7 @@ def flask_async(f):
 		# Record the task, and then launch it
 		flask_async_tasks[task_id] = {"task": threading.Thread(
 			target=task, args=(current_app._get_current_object(), request.environ))}
-		flask_async_tasks[task_id]["timestamp"] = time.time()
+		flask_async_tasks[task_id]["start_timestamp"] = time.time()
 		flask_async_tasks[task_id]["task"].start()
 		print("new task started ", task_id)
 
@@ -44,17 +47,21 @@ def flask_async(f):
 
 	return wrapped
 
-def flask_async_result(task_id = None):
-	# Return results of asynchronous task.
+def flask_async_log(task_id = None):
+	# Return logs of asynchronous task.
 	# If this request returns a 202 status code, it means that task hasn't finished yet.
 	if task_id:
-		task = flask_async_tasks.get(task_id)
+		tasks = [flask_async_tasks.get(task_id)]
 	elif len(flask_async_tasks) == 0:
 		return "no task has run yet", 404
 	else:
-		task = sorted(list(flask_async_tasks.values()), key = lambda i: i["timestamp"])[-1]
-	if task is None:
+		tasks = sorted(list(flask_async_tasks.values()), key = lambda i: i["start_timestamp"])
+	if not tasks or tasks[0] is None:
 		return "broken or invalid task", 404
-	if "result" not in task:
-		return {"taskid": task_id}, 202
-	return task["result"]
+	ret = ""
+	for task in tasks:
+		if "result" not in task:
+			ret += task["start_timestamp"] + " - still running\n"
+		else:
+			ret += task["start_timestamp"] + " - " + task["end_timestamp"] + " " task["result"] + "\n"
+	return ret
