@@ -8,10 +8,23 @@ import datetime
 from flask import current_app, request, abort
 from werkzeug.exceptions import HTTPException, InternalServerError
 
+LOG_SIZE = 500
+TIMEDELTA = timedelta(days = 1)
 flask_async_tasks = {}
 
 def get_timestamp():
 	return datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+
+def thin_out_log():
+	if len(flask_async_tasks) < LOG_SIZE:
+		return
+	threshold = (datetime.now() - TIMEDELTA).strftime("%Y/%m/%d %H:%M:%S")
+	old_keys = []
+	for k, v in flask_async_tasks.items():
+		if v["start_timestamp"] < threshold:
+			old_keys.append(k)
+	for k in old_keys:
+		del flask_async_tasks[k]
 
 def flask_async(f):
 	# This decorator transforms a sync route to asynchronous by running it in a background thread.
@@ -44,6 +57,8 @@ def flask_async(f):
 		flask_async_tasks[task_id]["start_timestamp"] = get_timestamp()
 		flask_async_tasks[task_id]["task"].start()
 		print("new task started ", task_id)
+		
+		thin_out_log()		
 
 		# Return a 202 response, with an id that the client can use to obtain task status
 		return {"taskid": task_id}, 202
