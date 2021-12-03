@@ -12,7 +12,6 @@ app = Flask(__name__)
 def app_route_index():
 	try:
 		return "Hello, World!"
-
 	except Exception as e:
 		return "Exception:" + str(traceback.format_exc()), 500
 
@@ -37,8 +36,7 @@ def app_route_update_mail_notice():
 
 	if not update_mail_notice(body, force_update):
 		return "server error", 500
-	dt = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-	return dt + " /mail post succeeded", 200
+	return "/mail post succeeded"
 
 @app.route("/schedule", methods=["POST"])
 @flask_async
@@ -52,8 +50,7 @@ def app_route_update_schedule_notice():
 
 	if not update_schedule_notice(body, force_update):
 		return "server error", 500
-	dt = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-	return dt + " /schedule post succeeded", 200
+	return "/schedule post succeeded"
 
 @app.route("/log", methods=["GET"])
 def app_route_log():
