@@ -4,7 +4,6 @@ import threading
 import uuid
 from functools import wraps
 import datetime
-import time
 
 from flask import current_app, request, abort
 from werkzeug.exceptions import HTTPException, InternalServerError
@@ -21,14 +20,14 @@ def flask_async(f):
 				try:
 					# Run the route function and record the response
 					flask_async_tasks[task_id]["result"] = f(*args, **kwargs)		
-					flask_async_tasks[task_id]["end_timestamp"] = time.time()
+					flask_async_tasks[task_id]["end_timestamp"] = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 				except HTTPException as e:
 					flask_async_tasks[task_id]["result"] = current_app.handle_http_exception(e)
-					flask_async_tasks[task_id]["end_timestamp"] = time.time()
+					flask_async_tasks[task_id]["end_timestamp"] = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 				except Exception as e:
 					# The function raised an exception, so we set a 500 error
 					flask_async_tasks[task_id]["result"] = InternalServerError()
-					flask_async_tasks[task_id]["end_timestamp"] = time.time()
+					flask_async_tasks[task_id]["end_timestamp"] = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 					if current_app.debug:
 						# We want to find out if something happened so reraise
 						raise
@@ -39,7 +38,7 @@ def flask_async(f):
 		# Record the task, and then launch it
 		flask_async_tasks[task_id] = {"task": threading.Thread(
 			target=task, args=(current_app._get_current_object(), request.environ))}
-		flask_async_tasks[task_id]["start_timestamp"] = time.time()
+		flask_async_tasks[task_id]["start_timestamp"] = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 		flask_async_tasks[task_id]["task"].start()
 		print("new task started ", task_id)
 
@@ -61,10 +60,8 @@ def flask_async_log(task_id = None):
 		return "broken or invalid task", 404
 	ret = ""
 	for task in tasks:
-		start = datetime.datetime.fromtimestamp(task["start_timestamp"])
 		if "result" not in task:
-			ret += f'{start} - still running\n'
+			ret += f'{task["start_timestamp"]} - still running<br>'
 		else:		
-			end = datetime.datetime.fromtimestamp(task["end_timestamp"])
-			ret += f'{start} - {end} {task["result"]}\n'
+			ret += f'{task["start_timestamp"]} - {task["end_timestamp"]} {task["result"]}<br>'
 	return ret
