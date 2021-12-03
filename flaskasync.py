@@ -81,6 +81,6 @@ def flask_async_log(task_id = None):
 		if "result" not in task:
 			ret += f'{task["start_timestamp"]} - still running<br>'
 		else:
-			end = task["end_timestamp"].split[" "][1]
+			end = task["end_timestamp"].split(" ")[1]
 			ret += f'{task["start_timestamp"]} - {end} {task["result"]}<br>'
 	return ret
