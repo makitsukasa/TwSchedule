@@ -10,6 +10,9 @@ from werkzeug.exceptions import HTTPException, InternalServerError
 
 flask_async_tasks = {}
 
+def get_timestamp():
+	return datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+
 def flask_async(f):
 	# This decorator transforms a sync route to asynchronous by running it in a background thread.
 	@wraps(f)
@@ -20,14 +23,14 @@ def flask_async(f):
 				try:
 					# Run the route function and record the response
 					flask_async_tasks[task_id]["result"] = f(*args, **kwargs)		
-					flask_async_tasks[task_id]["end_timestamp"] = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+					flask_async_tasks[task_id]["end_timestamp"] = get_timestamp()
 				except HTTPException as e:
 					flask_async_tasks[task_id]["result"] = current_app.handle_http_exception(e)
-					flask_async_tasks[task_id]["end_timestamp"] = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+					flask_async_tasks[task_id]["end_timestamp"] = get_timestamp()
 				except Exception as e:
 					# The function raised an exception, so we set a 500 error
 					flask_async_tasks[task_id]["result"] = InternalServerError()
-					flask_async_tasks[task_id]["end_timestamp"] = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+					flask_async_tasks[task_id]["end_timestamp"] = get_timestamp()
 					if current_app.debug:
 						# We want to find out if something happened so reraise
 						raise
@@ -38,7 +41,7 @@ def flask_async(f):
 		# Record the task, and then launch it
 		flask_async_tasks[task_id] = {"task": threading.Thread(
 			target=task, args=(current_app._get_current_object(), request.environ))}
-		flask_async_tasks[task_id]["start_timestamp"] = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+		flask_async_tasks[task_id]["start_timestamp"] = get_timestamp()
 		flask_async_tasks[task_id]["task"].start()
 		print("new task started ", task_id)
 
@@ -55,13 +58,14 @@ def flask_async_log(task_id = None):
 	elif len(flask_async_tasks) == 0:
 		return "no task has run yet", 404
 	else:
-		tasks = sorted(list(flask_async_tasks.values()), key = lambda i: i["start_timestamp"])
+		tasks = sorted(list(flask_async_tasks.values()), key = lambda i: i["start_timestamp"], reverse = True)
 	if not tasks or tasks[0] is None:
 		return "broken or invalid task", 404
 	ret = ""
 	for task in tasks:
 		if "result" not in task:
 			ret += f'{task["start_timestamp"]} - still running<br>'
-		else:		
-			ret += f'{task["start_timestamp"]} - {task["end_timestamp"]} {task["result"]}<br>'
+		else:
+			end = task["end_timestamp"].split[" "][1]
+			ret += f'{task["start_timestamp"]} - {end} {task["result"]}<br>'
 	return ret
