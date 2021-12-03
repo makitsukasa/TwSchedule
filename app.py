@@ -1,7 +1,7 @@
 import datetime
 import traceback
 from flask import Flask, request
-from flaskasync import flask_async, flask_async_result
+from flaskasync import flask_async, flask_async_log
 from tweet import tweet, check_key
 from tweetmail import update_mail_notice
 from tweetschedule import update_schedule_notice
