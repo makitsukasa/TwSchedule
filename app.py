@@ -38,7 +38,7 @@ def app_route_update_mail_notice():
 	if not update_mail_notice(body, force_update):
 		return "server error", 500
 	dt = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-	return dt + " /schedule post succeeded", 200
+	return dt + " /mail post succeeded", 200
 
 @app.route("/schedule", methods=["POST"])
 @flask_async
