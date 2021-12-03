@@ -55,13 +55,13 @@ def app_route_update_schedule_notice():
 	dt = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 	return dt + " /schedule post succeeded", 200
 
-@app.route("/result", methods=["GET"])
-def app_route_result():
-	return flask_async_result()
+@app.route("/log", methods=["GET"])
+def app_route_log():
+	return flask_async_log()
 
-@app.route("/result/<task_id>", methods=["GET"])
-def app_route_result_by_id(task_id):
-	return flask_async_result(task_id)
+@app.route("/log/<task_id>", methods=["GET"])
+def app_route_log_by_id(task_id):
+	return flask_async_log(task_id)
 
 @app.route("/receivepost", methods=["POST"])
 @flask_async
