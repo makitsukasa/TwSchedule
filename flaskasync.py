@@ -3,7 +3,7 @@
 import threading
 import uuid
 from functools import wraps
-import datetime
+from datetime, import datetime, timedelta
 
 from flask import current_app, request, abort
 from werkzeug.exceptions import HTTPException, InternalServerError
@@ -13,7 +13,7 @@ TIMEDELTA = timedelta(days = 1)
 flask_async_tasks = {}
 
 def get_timestamp():
-	return datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+	return datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
 def thin_out_log():
 	if len(flask_async_tasks) < LOG_SIZE:
