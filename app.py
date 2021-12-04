@@ -20,37 +20,37 @@ def app_route_index():
 @flask_async
 def app_route_tweet():
 	if not check_key_2nd():
-		return "irregal access", 400
+		return "/tweet irregal access", 400
 	if not tweet_2nd():
-		return "server error", 500
-	return "tweeted"
+		return "/tweet server error", 500
+	return "/tweet post succeeded"
 
 @app.route("/mail", methods=["POST"])
 @flask_async
 def app_route_update_mail_notice():
 	if not check_key():
-		return "irregal access", 400
+		return "/mail irregal access", 400
 	body = request.form.get("body")
 	if not body:
-		return "irregal access", 400
+		return "/mail irregal access", 400
 	force_update = True if request.form.get("force_update") == "true" else False
 
 	if not update_mail_notice(body, force_update):
-		return "server error", 500
+		return "/mail server error", 500
 	return "/mail post succeeded"
 
 @app.route("/schedule", methods=["POST"])
 @flask_async
 def app_route_update_schedule_notice():
 	if not check_key():
-		return "irregal access", 400
+		return "/schedule irregal access", 400
 	body = request.form.get("body")
 	if not body:
-		return "irregal access", 400
+		return "/schedule irregal access", 400
 	force_update = True if request.form.get("force_update") == "true" else False
 
 	if not update_schedule_notice(body, force_update):
-		return "server error", 500
+		return "/schedule server error", 500
 	return "/schedule post succeeded"
 
 @app.route("/log", methods=["GET"])
