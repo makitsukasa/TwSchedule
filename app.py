@@ -3,6 +3,7 @@ import traceback
 from flask import Flask, request
 from flaskasync import flask_async, flask_async_log
 from tweet import tweet, check_key
+from tweet2nd import tweet as tweet_2nd, check_key as check_key_2nd
 from tweetmail import update_mail_notice
 from tweetschedule import update_schedule_notice
 
@@ -18,9 +19,9 @@ def app_route_index():
 @app.route("/tweet", methods=["POST"])
 @flask_async
 def app_route_tweet():
-	if not check_key():
+	if not check_key_2nd():
 		return "irregal access", 400
-	if not tweet():
+	if not tweet_2nd():
 		return "server error", 500
 	return "tweeted"
 

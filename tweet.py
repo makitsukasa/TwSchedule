@@ -13,7 +13,7 @@ tweepy_api = tweepy.API(AUTH)
 def check_key():
 	if not request.form.get("key"):
 		return False
-	if request.form["key"] != hashlib.sha256(str(KEYS).encode('utf-8')).hexdigest():
+	if request.form["key"] != hashlib.sha256(str(KEYS).encode("utf-8")).hexdigest():
 		return False
 	return True
 
