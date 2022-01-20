@@ -62,7 +62,6 @@ def app_route_log_by_id(task_id):
 	return flask_async_log(task_id)
 
 @app.route("/receivepost", methods=["POST"])
-@flask_async
 def app_route_receivepost():
 	return request.get_data()
 
