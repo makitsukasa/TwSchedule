@@ -17,7 +17,6 @@ def app_route_index():
 		return "Exception:" + str(traceback.format_exc()), 500
 
 @app.route("/tweet", methods=["POST"])
-@flask_async
 def app_route_tweet():
 	if not check_key_2nd():
 		return "/tweet irregal access", 400
