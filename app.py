@@ -1,98 +1,68 @@
-import os
-import json
-from datetime import timezone, timedelta
-from imgutil import base64ify
-from tweet import (update_status, home_timeline,
-	create_favorite, destroy_favorite, retweet, get_image_url)
-from flask import Flask, request, render_template, make_response
-from flask_httpauth import HTTPDigestAuth
-from flask_talisman import Talisman
+import datetime
+import traceback
+from flask import Flask, request
+from flaskasync import flask_async, flask_async_log
+from tweet import tweet, check_key
+from tweet2nd import tweet as tweet_2nd, check_key as check_key_2nd
+from tweetmail import update_mail_notice
+from tweetschedule import update_schedule_notice
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('CUSTOMCONNSTR_SECRET_KEY')
-Talisman(app)
-users = json.loads(os.getenv('CUSTOMCONNSTR_USERS'))
-auth = HTTPDigestAuth()
 
-@app.route('/')
-@auth.login_required
+@app.route("/")
 def app_route_index():
-	return 'Hello, ' + auth.username()
-
-@app.route('/tw')
-@auth.login_required
-def app_route_tw():
-	return render_template('tw.html')
-
-@app.route('/tl')
-@auth.login_required
-def app_route_tl():
-	return render_template('tl.html', home_timeline = home_timeline())
-
-@app.route('/update_status', methods=['POST'])
-@auth.login_required
-def app_route_update_status():
-	body = request.form.get('body')
-	if not update_status(body):
-		return '/update_status server error', 500
-	return '/update_status post succeeded'
-
-@app.route('/create_favorite', methods=['POST'])
-@auth.login_required
-def app_route_create_favorite():
-	print('create_favorite')
-	id = request.json['id']
-	print(id)
-	if not id or not create_favorite(id):
-		return '/create_favorite server error', 500
-	return '/create_favorite post succeeded'
-
-@app.route('/destroy_favorite', methods=['POST'])
-@auth.login_required
-def app_route_destroy_favorite():
-	print('destroy_favorite')
-	id = request.json['id']
-	print(id)
-	if not id or not destroy_favorite(id):
-		return '/destroy_favorite server error', 500
-	return '/destroy_favorite post succeeded'
-
-@app.route('/retweet', methods=['POST'])
-@auth.login_required
-def app_route_retweet():
-	id = request.json['id']
-	if not id or not retweet(id):
-		return '/retweet server error', 500
-	return '/retweet post succeeded'
-
-@app.route('/image/<str:id>/<int:index>', methods=['GET'])
-@auth.login_required
-def app_route_image(id, index):
 	try:
-		url = get_image_url(id, index)
-		base64_image = base64ify(url)
-		return base64_image
-	except IndexError:
-		return "/image server error"
+		return "Hello, World!"
+	except Exception as e:
+		return "Exception:" + str(traceback.format_exc()), 500
 
-@app.route('/show_image', methods=['POST'])
-@auth.login_required
-def app_route_show_image():
-	id = request.form.get('id')
-	if not id:
-		return '/show_image server error', 500
-	return render_template('img.html', id=id)
+@app.route("/tweet", methods=["POST"])
+def app_route_tweet():
+	if not check_key_2nd():
+		return "/tweet irregal access", 400
+	if not tweet_2nd():
+		return "/tweet server error", 500
+	return "/tweet post succeeded"
 
-@app.route('/receive', methods=['GET', 'POST'])
-def app_route_receive():
-	return 'HRADER<br>' + str(request.headers) + '<br><br>' +\
-		'DATA<br>' + request.get_data(as_text=True)
+@app.route("/mail", methods=["POST"])
+@flask_async
+def app_route_update_mail_notice():
+	if not check_key():
+		return "/mail irregal access", 400
+	body = request.form.get("body")
+	if not body:
+		return "/mail irregal access", 400
+	force_update = True if request.form.get("force_update") == "true" else False
 
-@auth.get_password
-def get_password(username):
-	if username in users:
-		return users.get(username)
-	return None
+	if not update_mail_notice(body, force_update):
+		return "/mail server error", 500
+	return "/mail post succeeded"
 
-if __name__ == '__main__':
-	app.run(debug=True)
+@app.route("/schedule", methods=["POST"])
+@flask_async
+def app_route_update_schedule_notice():
+	if not check_key():
+		return "/schedule irregal access", 400
+	body = request.form.get("body")
+	if not body:
+		return "/schedule irregal access", 400
+	force_update = True if request.form.get("force_update") == "true" else False
+
+	if not update_schedule_notice(body, force_update):
+		return "/schedule server error", 500
+	return "/schedule post succeeded"
+
+@app.route("/log", methods=["GET"])
+def app_route_log():
+	return flask_async_log()
+
+@app.route("/log/<task_id>", methods=["GET"])
+def app_route_log_by_id(task_id):
+	return flask_async_log(task_id)
+
+@app.route("/receivepost", methods=["POST"])
+def app_route_receivepost():
+	return request.get_data()
+
+if __name__ == "__main__":
+	app.run(debug = True)
