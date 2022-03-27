@@ -18,14 +18,14 @@ def format(json):
 			continue
 		first_title_flag = True
 		for schedule in json[date]:
-			if len(schedule["visible"]) > 0:
-				continue
 			if first_title_flag:
 				ans += " "
 			else:
 				ans += "         "
 			ans += schedule["title"] + "\n"
 			first_title_flag = False
+		if not first_title_flag:
+			ans += " - \n"
 	return ans[:-1]
 
 def update_schedule_notice(schedules, should_update):
