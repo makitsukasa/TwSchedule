@@ -1,5 +1,6 @@
 azure==4.0.0
 azure-appconfiguration
+Jinja2==3.0.3
 Flask==1.1.2
 Flask-HTTPAuth
 tweepy
