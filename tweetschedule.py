@@ -24,7 +24,7 @@ def format(json):
 				ans += "         "
 			ans += schedule["title"] + "\n"
 			first_title_flag = False
-		if not first_title_flag:
+		if first_title_flag:
 			ans += " - \n"
 	return ans[:-1]
 
